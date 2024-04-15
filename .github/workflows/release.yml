@@ -3,12 +3,12 @@ name: Publish Release
 on:
   workflow_dispatch:
     inputs:
-      checkout_tag:
-        description: 'Checkout tag'
-        required: true
-        type: string
       release_tag:
         description: 'Release tag'
+        required: true
+        type: string
+      checkout_tag:
+        description: 'Checkout tag'
         required: true
         type: string
   release:
@@ -20,10 +20,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.checkout_tag }} 
+          ref: ${{ inputs.checkout_tag }}
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '11'
       - name: Build with Maven
-        run: mvn clean install -DskipTests -Dlicense.skip -Ddockerfile.skip=false
+        run: mvn -T 1C clean install -DskipTests -Dlicense.skip -Ddockerfile.skip=false
+      # Tag images
+      - name: Tag Images
+        run: |
+          docker tag thingsboard/tb-postgres ybdcregistry.azurecr.io/thingsboard/tb-postgres:${{ inputs.release_tag }}
+          docker tag thingsboard/tb-cassandra ybdcregistry.azurecr.io/thingsboard/tb-cassandra:${{ inputs.release_tag }}
+          docker tag thingsboard/tb ybdcregistry.azurecr.io/thingsboard/tb:${{ inputs.release_tag }}
+          docker tag thingsboard/tb-postgres ybdcregistry.azurecr.io/thingsboard/tb-postgres:latest
+          docker tag thingsboard/tb-cassandra ybdcregistry.azurecr.io/thingsboard/tb-cassandra:latest
+          docker tag thingsboard/tb ybdcregistry.azurecr.io/thingsboard/tb:latest
+      # ACR login
+      - name: login to azure container registry
+        uses: Azure/docker-login@v1
+        with:
+          login-server: ydxregistry.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_TOKEN }}
+      # Push images
+      - name: push the docker image to Azure Container Registry
+        run: |
+          docker push ybdcregistry.azurecr.io/thingsboard/tb-postgres:${{ inputs.release_tag }}
+          docker push ybdcregistry.azurecr.io/thingsboard/tb-cassandra:${{ inputs.release_tag }}
+          docker push ybdcregistry.azurecr.io/thingsboard/tb:${{ inputs.release_tag }}
+          docker push ybdcregistry.azurecr.io/thingsboard/tb-postgres:latest
+          docker push ybdcregistry.azurecr.io/thingsboard/tb-cassandra:latest
+          docker push ybdcregistry.azurecr.io/thingsboard/tb:latest
