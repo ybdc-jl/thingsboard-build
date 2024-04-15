@@ -1,0 +1,29 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      checkout_tag:
+        description: 'Checkout tag'
+        required: true
+        type: string
+      release_tag:
+        description: 'Release tag'
+        required: true
+        type: string
+  release:
+    types: [published]
+
+jobs:
+  build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout_tag }} 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - name: Build with Maven
+        run: mvn clean install -DskipTests -Dlicense.skip -Ddockerfile.skip=false
