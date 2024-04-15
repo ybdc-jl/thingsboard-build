@@ -32,10 +32,8 @@ jobs:
         run: |
           docker tag thingsboard/tb-postgres ybdcregistry.azurecr.io/thingsboard/tb-postgres:${{ inputs.release_tag }}
           docker tag thingsboard/tb-cassandra ybdcregistry.azurecr.io/thingsboard/tb-cassandra:${{ inputs.release_tag }}
-          docker tag thingsboard/tb ybdcregistry.azurecr.io/thingsboard/tb:${{ inputs.release_tag }}
           docker tag thingsboard/tb-postgres ybdcregistry.azurecr.io/thingsboard/tb-postgres:latest
           docker tag thingsboard/tb-cassandra ybdcregistry.azurecr.io/thingsboard/tb-cassandra:latest
-          docker tag thingsboard/tb ybdcregistry.azurecr.io/thingsboard/tb:latest
       # ACR login
       - name: login to azure container registry
         uses: Azure/docker-login@v1
@@ -48,7 +46,5 @@ jobs:
         run: |
           docker push ybdcregistry.azurecr.io/thingsboard/tb-postgres:${{ inputs.release_tag }}
           docker push ybdcregistry.azurecr.io/thingsboard/tb-cassandra:${{ inputs.release_tag }}
-          docker push ybdcregistry.azurecr.io/thingsboard/tb:${{ inputs.release_tag }}
           docker push ybdcregistry.azurecr.io/thingsboard/tb-postgres:latest
           docker push ybdcregistry.azurecr.io/thingsboard/tb-cassandra:latest
-          docker push ybdcregistry.azurecr.io/thingsboard/tb:latest
