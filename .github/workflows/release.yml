@@ -38,7 +38,7 @@ jobs:
       - name: login to azure container registry
         uses: Azure/docker-login@v1
         with:
-          login-server: ydxregistry.azurecr.io
+          login-server: ybdcregistry.azurecr.io
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_TOKEN }}
       # Push images
